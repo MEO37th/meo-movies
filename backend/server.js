@@ -9,10 +9,6 @@ import authRoutes from "./routes/auth.js"
 import movieRoutes from "./routes/movies.js"
 import userRoutes from "./routes/users.js"
 
-console.log("✅ .env file loaded")
-console.log("🔑 TMDB_API_KEY loaded:", !!process.env.TMDB_API_KEY)
-console.log("TMDB_API_KEY value:", process.env.TMDB_API_KEY)
-
 
 const app = express()
 const PORT = process.env.PORT || 5000
