@@ -17,6 +17,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
+      "http://localhost:3002",
       "https://meo-movies.vercel.app", // Your Vercel frontend
       "https://meo-movies.onrender.com" // Your Render backend
     ],
