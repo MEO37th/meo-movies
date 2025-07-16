@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'development' ? "http://localhost:5000" : "https://meo-movies.onrender.com",
+  baseURL: "https://meo-movies.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },
