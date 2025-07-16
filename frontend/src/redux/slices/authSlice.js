@@ -12,7 +12,7 @@ export const register = createAsyncThunk(
   async ({ username, email, password }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(clearError())
-      const response = await api.post("/auth/register", { username, email, password })
+      const response = await api.post("/api/auth/register", { username, email, password })
       localStorage.setItem("token", response.data.token)
       localStorage.setItem("user", JSON.stringify(response.data.user))
       return response.data
@@ -28,7 +28,7 @@ export const register = createAsyncThunk(
 export const login = createAsyncThunk("auth/login", async ({ email, password }, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.post("/auth/login", { email, password })
+    const response = await api.post("/api/auth/login", { email, password })
     localStorage.setItem("token", response.data.token)
     localStorage.setItem("user", JSON.stringify(response.data.user))
     return response.data
@@ -43,7 +43,7 @@ export const login = createAsyncThunk("auth/login", async ({ email, password }, 
 export const getUserProfile = createAsyncThunk("auth/getUserProfile", async (_, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.get("/users/profile")
+    const response = await api.get("/api/users/profile")
     return response.data
   } catch (error) {
     const message = error.response?.data?.message || "Failed to fetch profile"
@@ -58,7 +58,7 @@ export const updateProfile = createAsyncThunk(
   async (profileData, { dispatch, rejectWithValue }) => {
     try {
       dispatch(clearError())
-      const response = await api.put("/users/profile", profileData)
+      const response = await api.put("/api/users/profile", profileData)
       return response.data
     } catch (error) {
       const message = error.response?.data?.message || "Failed to update profile"

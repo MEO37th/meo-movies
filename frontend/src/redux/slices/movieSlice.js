@@ -6,7 +6,7 @@ import { setError, clearError } from "./uiSlice"
 export const getTrendingMovies = createAsyncThunk("movies/getTrending", async (_, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.get("/movies/trending")
+    const response = await api.get("/api/movies/trending")
     return response.data.results
   } catch (error) {
     const message = error.response?.data?.message || "Failed to fetch trending movies"
@@ -19,7 +19,7 @@ export const getTrendingMovies = createAsyncThunk("movies/getTrending", async (_
 export const searchMovies = createAsyncThunk("movies/search", async (query, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.get(`/movies/search?query=${query}`)
+    const response = await api.get(`/api/movies/search?query=${query}`)
     return response.data.results
   } catch (error) {
     const message = error.response?.data?.message || "Failed to search movies"
@@ -32,7 +32,7 @@ export const searchMovies = createAsyncThunk("movies/search", async (query, { di
 export const getMovieDetails = createAsyncThunk("movies/getDetails", async (id, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.get(`/movies/details/${id}`)
+    const response = await api.get(`/api/movies/details/${id}`)
     return response.data
   } catch (error) {
     const message = error.response?.data?.message || "Failed to fetch movie details"
@@ -45,7 +45,7 @@ export const getMovieDetails = createAsyncThunk("movies/getDetails", async (id, 
 export const getGenres = createAsyncThunk("movies/getGenres", async (_, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.get("/movies/genres")
+    const response = await api.get("/api/movies/genres")
     return response.data.genres
   } catch (error) {
     const message = error.response?.data?.message || "Failed to fetch genres"
@@ -60,7 +60,7 @@ export const getMoviesByGenre = createAsyncThunk(
   async (genreId, { dispatch, rejectWithValue }) => {
     try {
       dispatch(clearError())
-      const response = await api.get(`/movies/genre/${genreId}`)
+      const response = await api.get(`/api/movies/genre/${genreId}`)
       return {
         genreId,
         movies: response.data.results,
@@ -77,7 +77,7 @@ export const getMoviesByGenre = createAsyncThunk(
 export const getFavorites = createAsyncThunk("movies/getFavorites", async (_, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.get("/users/favorites")
+    const response = await api.get("/api/users/favorites")
     return response.data
   } catch (error) {
     const message = error.response?.data?.message || "Failed to fetch favorites"
@@ -92,7 +92,7 @@ export const addToFavorites = createAsyncThunk(
   async (movieId, { dispatch, rejectWithValue }) => {
     try {
       dispatch(clearError())
-      const response = await api.post(`/movies/favorites/${movieId}`)
+      const response = await api.post(`/api/movies/favorites/${movieId}`)
       return response.data.movie
     } catch (error) {
       const message = error.response?.data?.message || "Failed to add to favorites"
@@ -108,7 +108,7 @@ export const removeFromFavorites = createAsyncThunk(
   async (movieId, { dispatch, rejectWithValue }) => {
     try {
       dispatch(clearError())
-      await api.delete(`/movies/favorites/${movieId}`)
+      await api.delete(`/api/movies/favorites/${movieId}`)
       return movieId
     } catch (error) {
       const message = error.response?.data?.message || "Failed to remove from favorites"
@@ -122,7 +122,7 @@ export const removeFromFavorites = createAsyncThunk(
 export const getWatchlist = createAsyncThunk("movies/getWatchlist", async (_, { dispatch, rejectWithValue }) => {
   try {
     dispatch(clearError())
-    const response = await api.get("/users/watchlist")
+    const response = await api.get("/api/users/watchlist")
     return response.data
   } catch (error) {
     const message = error.response?.data?.message || "Failed to fetch watchlist"
@@ -137,7 +137,7 @@ export const addToWatchlist = createAsyncThunk(
   async (movieId, { dispatch, rejectWithValue }) => {
     try {
       dispatch(clearError())
-      const response = await api.post(`/movies/watchlist/${movieId}`)
+      const response = await api.post(`/api/movies/watchlist/${movieId}`)
       return response.data.movie
     } catch (error) {
       const message = error.response?.data?.message || "Failed to add to watchlist"
@@ -153,7 +153,7 @@ export const removeFromWatchlist = createAsyncThunk(
   async (movieId, { dispatch, rejectWithValue }) => {
     try {
       dispatch(clearError())
-      await api.delete(`/movies/watchlist/${movieId}`)
+      await api.delete(`/api/movies/watchlist/${movieId}`)
       return movieId
     } catch (error) {
       const message = error.response?.data?.message || "Failed to remove from watchlist"
