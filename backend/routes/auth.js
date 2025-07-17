@@ -13,6 +13,7 @@ const generateToken = (id) => {
 // Register user
 router.post("/register", async (req, res) => {
   try {
+    console.log("Register request received:", req.body);
     const { username, email, password } = req.body
 
     // Validation
@@ -24,20 +25,31 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Password must be at least 6 characters" })
     }
 
-    // Check if user exists
+    // Check if user exists - with case insensitive search for email
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
+      $or: [
+        { email: { $regex: new RegExp("^" + email + "$", "i") } },
+        { username: { $regex: new RegExp("^" + username + "$", "i") } }
+      ],
     })
 
     if (existingUser) {
+      console.log("User already exists:", existingUser.email, existingUser.username);
       return res.status(400).json({
-        message: existingUser.email === email ? "Email already registered" : "Username already taken",
+        message: existingUser.email.toLowerCase() === email.toLowerCase() ? 
+          "Email already registered" : "Username already taken",
       })
     }
 
     // Create user
-    const user = new User({ username, email, password })
+    const user = new User({ 
+      username, 
+      email: email.toLowerCase(), // Store email in lowercase
+      password 
+    })
+    
     await user.save()
+    console.log("User created successfully:", user._id);
 
     // Generate token
     const token = generateToken(user._id)
@@ -54,7 +66,7 @@ router.post("/register", async (req, res) => {
     })
   } catch (error) {
     console.error("Register error:", error)
-    res.status(500).json({ message: "Server error during registration" })
+    res.status(500).json({ message: "Server error during registration: " + error.message })
   }
 })
 

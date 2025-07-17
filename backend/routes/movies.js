@@ -33,8 +33,26 @@ const tmdbRequest = async (endpoint) => {
 
 // Add CORS headers explicitly to all movie routes
 router.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://meo-movies.vercel.app");
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3002",
+    "https://meo-movies.vercel.app"
+  ];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  
   res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   next();
 });
 
@@ -74,6 +92,103 @@ router.get("/genres", async (req, res) => {
   }
 });
 
-// ... (keep your existing routes for /popular, /top-rated, etc.)
+// Get movies by genre
+router.get("/genre/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await tmdbRequest(`/discover/movie?with_genres=${id}`);
+    res.json({ 
+      success: true, 
+      results: data.results,
+      expiresAt: new Date(Date.now() + 3600000).toISOString() // 1-hour cache
+    });
+  } catch (error) {
+    console.error(`Genre ${req.params.id} movies error:`, error);
+    res.status(502).json({ 
+      message: "Failed to fetch movies by genre",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
+  }
+});
+
+// Search movies
+router.get("/search", async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+    
+    const data = await tmdbRequest(`/search/movie?query=${encodeURIComponent(query)}`);
+    res.json({ 
+      success: true, 
+      results: data.results,
+      expiresAt: new Date(Date.now() + 3600000).toISOString() // 1-hour cache
+    });
+  } catch (error) {
+    console.error(`Search error for '${req.query.query}':`, error);
+    res.status(502).json({ 
+      message: "Failed to search movies",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
+  }
+});
+
+// Get movie details
+router.get("/details/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await tmdbRequest(`/movie/${id}?append_to_response=credits,videos,similar`);
+    res.json({ 
+      success: true, 
+      movie: data,
+      expiresAt: new Date(Date.now() + 86400000).toISOString() // 24-hour cache
+    });
+  } catch (error) {
+    console.error(`Movie details error for ID ${req.params.id}:`, error);
+    res.status(502).json({ 
+      message: "Failed to fetch movie details",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
+  }
+});
+
+// Get popular movies
+router.get("/popular", async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const data = await tmdbRequest(`/movie/popular?page=${page}`);
+    res.json({ 
+      success: true, 
+      results: data.results,
+      expiresAt: new Date(Date.now() + 3600000).toISOString() // 1-hour cache
+    });
+  } catch (error) {
+    console.error("Popular movies error:", error);
+    res.status(502).json({ 
+      message: "Failed to fetch popular movies",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
+  }
+});
+
+// Get top rated movies
+router.get("/top-rated", async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const data = await tmdbRequest(`/movie/top_rated?page=${page}`);
+    res.json({ 
+      success: true, 
+      results: data.results,
+      expiresAt: new Date(Date.now() + 3600000).toISOString() // 1-hour cache
+    });
+  } catch (error) {
+    console.error("Top rated movies error:", error);
+    res.status(502).json({ 
+      message: "Failed to fetch top rated movies",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
+  }
+});
 
 export default router;

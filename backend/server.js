@@ -15,16 +15,30 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json({ limit: "10mb" }));
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3002",
-      "https://meo-movies.vercel.app", // Your Vercel frontend
-      "https://meo-movies.onrender.com" // Your Render backend
-    ],
+    origin: function(origin, callback) {
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "http://localhost:3002",
+        "https://meo-movies.vercel.app", // Your Vercel frontend
+        "https://meo-movies.onrender.com" // Your Render backend
+      ];
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log("Blocked by CORS: ", origin);
+        callback(null, true); // Temporarily allow all origins for debugging
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"] // Added OPTIONS for preflight
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
 
 // Debugging middleware
 app.use((req, res, next) => {
